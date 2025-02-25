@@ -1,0 +1,33 @@
+program sqrt_newton
+    implicit none
+    
+    real(8) :: N, x, tol, diff
+    integer :: iter, max_iter
+
+    tol = 1.0d-10
+    max_iter = 100
+
+    print *, "Find square root of Number:"
+    read(*,*) N
+
+    if (N < 0.0d0) then
+        print *, "This method cannot handle imaginary numbers"
+        stop
+    end if
+ 
+    x = N / 2.0d0
+    iter = 0
+
+    do
+        diff = (x + N / x) / 2.0d0 - x
+        x = x + diff
+        iter = iter + 1
+
+        ! Exit when iteration reaches threshold precision
+        if (abs(diff) < tol .or. iter >= max_iter) exit
+    end do
+    
+    print *, "Square root of ", N, " is ", x
+    print *, "How many Iterations:", iter
+    
+end program sqrt_newton
