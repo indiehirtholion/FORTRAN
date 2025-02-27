@@ -1,0 +1,54 @@
+program RouletteBayesian
+    implicit none
+    integer :: total_spins, red_count, black_count, green_count
+    real :: prior_prob, updated_prob, likelihood, evidence
+    character(len=1) :: result, choice
+
+    total_spins = 0
+    red_count = 0
+    black_count = 0
+    green_count = 0
+
+    prior_prob = 18.0 / 37.0  
+
+    do
+        print *, "Enter spin result (R = Red, B = Black, G = Green):"
+        read *, result
+        total_spins = total_spins + 1
+
+        if (result == 'R' .or. result == 'r') then
+            red_count = red_count + 1
+        else if (result == 'B' .or. result == 'b') then
+            black_count = black_count + 1
+        else if (result == 'G' .or. result == 'g') then
+            green_count = green_count + 1
+        else
+            print *, "Invalid input. Try again."
+            cycle
+        end if
+
+        likelihood = real(red_count) / real(total_spins)
+
+        evidence = prior_prob
+
+        updated_prob = (likelihood * prior_prob) / evidence
+
+        print *, "-----------------------------------"
+        print *, "Total Spins: ", total_spins
+        print *, "Red : ", red_count, ", Black : ", black_count, ", Green : ", green_count
+        print *, "Updated RED Probability: ", updated_prob
+
+        if (updated_prob > prior_prob) then
+            print *, "BET: Red is appearing more often!"
+        else
+            print *, "NO BET: No significant gravity bias detected."
+        end if
+        print *, "-----------------------------------"
+
+        print *, "Do you want to enter another spin? (y/n)"
+        read *, choice
+        if (choice /= 'y' .and. choice /= 'Y') exit
+    end do
+
+end program RouletteBayesian
+
