@@ -1,0 +1,24 @@
+program EuclideanAlgorithm
+  implicit none
+  integer :: a, b, result
+
+  print *, 'Enter the two integers:'
+  read(*,*) a, b
+
+  result = gcd(a, b)
+
+  print *, 'The GCD of', a, 'and', b, 'is:', result
+
+contains
+
+  recursive function gcd(x, y) result(res)
+    integer, intent(in) :: x, y
+    integer :: res
+    if (y == 0) then
+      res = x
+    else
+      res = gcd(y, mod(x, y))
+    end if
+  end function gcd
+
+end program EuclideanAlgorithm
