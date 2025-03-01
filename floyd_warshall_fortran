@@ -1,0 +1,91 @@
+program warehouse_optimization
+  implicit none
+  integer, parameter :: N = 5  ! Number of pick locations (nodes)
+  integer :: i, j, k
+  real, parameter :: INF = 1.0e6
+  real :: manual_routes(N, N), floyd_warshall_routes(N, N)
+
+
+  call initialize_routes(manual_routes, floyd_warshall_routes)
+
+  print *, 'Initial Distance Matrix (Manual Sorting Method):'
+  call print_matrix(manual_routes)
+
+  ! use Floyd-Warshall algorithm
+  call floyd_warshall(floyd_warshall_routes, N)
+
+  print *, 'Optimized Distance Matrix (Floyd-Warshall Algorithm):'
+  call print_matrix(floyd_warshall_routes)
+
+  call print_explanation()
+
+contains
+
+  subroutine initialize_routes(manual_routes, floyd_warshall_routes)
+    real, intent(out) :: manual_routes(N, N), floyd_warshall_routes(N, N)
+
+    manual_routes = INF
+    floyd_warshall_routes = INF
+
+    do i = 1, N
+      manual_routes(i, i) = 0.0
+      floyd_warshall_routes(i, i) = 0.0
+    end do
+
+    ! inefficient 
+    manual_routes(1,2) = 5; manual_routes(2,3) = 3; manual_routes(3,4) = 2;
+    manual_routes(4,5) = 4; manual_routes(1,5) = 12; manual_routes(2,4) = 7;
+    
+    ! Copy manual routes to Floyd-Warshall 
+    floyd_warshall_routes = manual_routes
+  end subroutine initialize_routes
+
+  subroutine floyd_warshall(dist, n)
+    integer, intent(in) :: n
+    real, intent(inout) :: dist(n, n)
+    integer :: i, j, k
+    
+    do k = 1, n
+      do i = 1, n
+        do j = 1, n
+          if (dist(i, j) > dist(i, k) + dist(k, j)) then
+            dist(i, j) = dist(i, k) + dist(k, j)
+          end if
+        end do
+      end do
+    end do
+  end subroutine floyd_warshall
+
+  subroutine print_matrix(matrix)
+    real, intent(in) :: matrix(N, N)
+    do i = 1, N
+      write(*, '(5F10.2)') (matrix(i, j), j=1, N)
+    end do
+  end subroutine print_matrix
+
+  subroutine print_explanation()
+    print *, ''
+    print *, 'Explanation of Results:'
+    print *, 'Initial Distance Matrix (Manual Sorting Method)'
+    print *, 'This represents the original, unoptimized routing system.'
+    print *, 'The values in the matrix indicate direct distances between pick locations.'
+    print *, '100.00 represents an effectively unreachable or unconnected path.'
+    print *, 'Key takeaways:'
+    print *, 'Direct paths exist but are limited:'
+    print *, '1->2 is 5.00, 2->3 is 3.00, 3->4 is 2.00, 4->5 is 4.00.'
+    print *, '1->5 is 12.00 (a long direct route), 2->4 is 7.00.'
+    print *, 'Some locations are not directly connected, leading to inefficiencies.'
+    print *, ''
+    print *, 'Optimized Distance Matrix (Floyd-Warshall Algorithm)'
+    print *, 'After running the Floyd-Warshall algorithm, shortest paths are calculated.'
+    print *, 'Inefficient indirect routes are replaced with optimal ones.'
+    print *, 'Distances are reduced through better routing:'
+    print *, '1->3 improved from 100.00 → 8.00 (via 1->2->3)'
+    print *, '1->4 improved from 100.00 → 10.00 (via 1->2->3->4)'
+    print *, '2->4 improved from 7.00 → 5.00 (via 2->3->4)'
+    print *, '2->5 improved from 100.00 → 9.00 (via 2->3->4->5)'
+    print *, '3->5 improved from 100.00 → 6.00 (via 3->4->5)'
+    print *, ''
+  end subroutine print_explanation
+
+end program warehouse_optimization
